@@ -1,17 +1,17 @@
-import express, { NextFunction, Request, Response } from 'express';
-import globalErrorHandler from './middlewares/globalErrorHandler';
-import createHttpError from 'http-errors';
+import express, { NextFunction, Request, Response } from "express";
+import globalErrorHandler from "./middlewares/globalErrorHandler";
+import userRouter from "./user/userRoutes";
 
+const app = express();
 
-const app=express();
-
-app.get("/",(req:Request,res:Response,next:NextFunction)=>{
-  
+app.get("/", (req: Request, res: Response, next: NextFunction) => {
   res.status(200).json({
-    success:true,
-    message:"Welcome to The Books API/v1"
-  })
-})
+    success: true,
+    message: "Welcome to The Books API/v1",
+  });
+});
+
+app.use("/api/users", userRouter);
 
 //Global Error Handler
 app.use(globalErrorHandler);
