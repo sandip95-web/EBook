@@ -7,6 +7,19 @@ import { config } from "../config/config";
 import { sign } from "jsonwebtoken";
 import { User } from "./userTypes";
 
+const generateToken = async (user: User, res: Response, next: NextFunction) => {
+  try {
+    const token = sign({ sub: user._id }, config.secret as string, {
+      expiresIn: config.expire,
+    });
+    res.status(201).json({
+      accessToken: token,
+    });
+  } catch (error) {
+    return next(createHttpError(500, "Error while signing token"));
+  }
+};
+
 const registerUser = async (
   req: Request,
   res: Response,
@@ -40,16 +53,28 @@ const registerUser = async (
   } catch (error) {
     return next(createHttpError(500, "Error while creating user."));
   }
+  generateToken(newUser, res, next);
+};
+
+const loginUser = async (req: Request, res: Response, next: NextFunction) => {
+  const { email, password } = req.body;
+
   try {
-    const token = sign({ sub: newUser._id }, config.secret as string, {
-      expiresIn: config.expire,
-    });
-    res.status(201).json({
-      accessToken: token,
-    });
+    const checkUserExist = await userModel.findOne({ email });
+    if (!checkUserExist) {
+      return next(createHttpError(400, "User with that email doesn't exist."));
+    }
+    const checkPasssword = await bcrypt.compare(
+      password,
+      checkUserExist.password
+    );
+    if (!checkPasssword) {
+      return next(createHttpError(400, "Email or Password is incorrect."));
+    }
+    generateToken(checkUserExist, res, next);
   } catch (error) {
-    return next(createHttpError(500, "Error while signing token"));
+    return next(createHttpError(500, "Error while getting user."));
   }
 };
 
-export { registerUser };
+export { registerUser,loginUser };
