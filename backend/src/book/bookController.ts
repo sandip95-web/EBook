@@ -13,13 +13,13 @@ const createBook = async (req: Request, res: Response, next: NextFunction) => {
   const fileName = files.coverImage[0].filename;
   const filePath = path.resolve(
     __dirname,
-    "../../public/data/uploads" + fileName
+    "../../public/data/uploads/" + fileName
   );
 
   const bookFileName = files.file[0].filename;
   const bookFilePath = path.resolve(
     __dirname,
-    "../../public/data/uploads" + bookFileName
+    "../../public/data/uploads/" + bookFileName
   );
 
   try {
@@ -146,4 +146,29 @@ const updateBook = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export { createBook, updateBook };
+const listBooks = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const books = await bookModel.find();
+    res.status(200).json({
+      data: books,
+    });
+  } catch (error) {
+    return next(createHttpError(500, "Error while getting a book"));
+  }
+};
+
+const getSingleBook = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const bookId=req.params.bookId
+    const book = await bookModel.findOne({_id:bookId});
+    if(!book){
+      return next(createHttpError(404,"Book not found."))
+    }
+    res.status(200).json({
+      data: book,
+    });
+  } catch (error) {
+    return next(createHttpError(500, "Error while getting a book"));
+  }
+};
+export { createBook, updateBook,listBooks,getSingleBook };
