@@ -9,8 +9,8 @@ const _config = {
   expire:process.env.JWT_EXPIRE,
   cloudinaryCloud:process.env.CLOUDINARY_CLOUD,
   cloudinaryKey:process.env.CLOUDINARY_KEY,
-  cloudinarySecret:process.env.CLOUDINARY_SECRET
-
+  cloudinarySecret:process.env.CLOUDINARY_SECRET,
+  domain:process.env.FRONTEND_DOMAIN
 };
 
 export const config = Object.freeze(_config);
